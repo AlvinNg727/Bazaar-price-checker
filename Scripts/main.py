@@ -1,66 +1,75 @@
 import requests
-import time
-from getAverage import check_average
 from items import items
 
 api_key = "ba710f2d-6547-4936-8aab-72b01300a8a5"
 
-priceList = []
-currentIndex = 0
-page = 1
+def check_average(json, productId):
+    #if there are no buy orders for the item, the buyPrice will = 0
+    if len(json[productId]['sell_summary']) > 0:
+        buyPrice = json[productId]["sell_summary"][0]["pricePerUnit"]
+    else:
+        buyPrice = 0
 
-names = []
-finalItems = []
+    #if there are no sell orders for the item, the sellPrice will = 0
+    if len(json[productId]['buy_summary']) > 0:
+        sellPrice = json[productId]["buy_summary"][0]["pricePerUnit"]
+    else:
+        sellPrice = 0
+    return round((sellPrice - buyPrice), 1)
 
-#checkItem = requests.get("https://api.hypixel.net/skyblock/bazaar?key=" + api_key).json()
-#checkItem = checkItem["products"]
-
+#the lowest amount the insta sell and buy have to be in last 7d
 lowestAmount = 0
 
-def check():
+#getting the lowest amount
+def getAmount():
     global lowestAmount
     try:
         lowestAmount = int(input("What is the lowest amount of insta buys and insta sells: "))
     except ValueError:
         print("That is not a valid number.")
-        check()
+        getAmount()
     if lowestAmount >= 0:
         pass
     else:
         print("That is not a valid number.")
-        check()
+        getAmount()
 
+itemsList = []
+page = 1
+
+names = []
+finalItems = []
 
 def Main():
-    global currentIndex, priceList, names, finalItems, lowestAmount, page
-
-    checkItem = requests.get("https://api.hypixel.net/skyblock/bazaar?key=" + api_key).json()
-    checkItem = checkItem["products"]
+    global itemsList, names, finalItems, page
 
     currentIndex = 0
-    priceList.clear()
+    itemsList.clear()
     names.clear()
     finalItems.clear()
     item = ""
     page = 1
 
-    check()
+    getAmount()
 
-    startTime = time.time()
+    bazaarJson = requests.get("https://api.hypixel.net/skyblock/bazaar?key=" + api_key).json()
+    bazaarJson = bazaarJson["products"]
 
+    #get
     for key in items:
-        if (checkItem[items[key]]["quick_status"]["sellMovingWeek"] >= lowestAmount) and (checkItem[items[key]]["quick_status"]["buyMovingWeek"] >= lowestAmount):
-            item = check_average(items[key])
-            priceList.append([item, key])
+        value = items[key]
+        if (bazaarJson[value]["quick_status"]["sellMovingWeek"] >= lowestAmount) and (bazaarJson[value]["quick_status"]["buyMovingWeek"] >= lowestAmount):
+            item = check_average(bazaarJson, value)
+            itemsList.append([item, key])
         currentIndex += 1
-        endTime = time.time()
-        print(str(currentIndex) + "/197    " + str(round((endTime - startTime), 1)) + " seconds")
+        print(str(currentIndex) + "/197    ")
 
-    priceList.sort(reverse=True)
+    #reverse the list
+    itemsList.sort(reverse=True)
 
-    for i in range(len(priceList)):
-        names.append(priceList[i][1])
-        finalItems.append(priceList[i][0])
+    for i in range(len(itemsList)):
+        names.append(itemsList[i][1])
+        finalItems.append(itemsList[i][0])
 
     printLn(names, finalItems)
 
@@ -72,31 +81,28 @@ def Main():
 
 
 def printLn(name, price):
-    global page, priceList
+    global page
 
     maxPage = 0
 
-    if len(priceList) % 10 != 0:
-        maxPage = (len(priceList) // 10) + 1
-    elif len(priceList) % 10 == 0:
-        maxPage = len(priceList) // 10
+    if len(name) % 10 != 0:
+        maxPage = (len(name) // 10) + 1
+    elif len(name) % 10 == 0:
+        maxPage = len(name) // 10
 
     if page <= maxPage:
         if page == maxPage:
-            for i in range((page * 10) - 10, len(priceList)):
+            for i in range((page * 10) - 10, len(name)):
                 print(str(i + 1) + ". " + str(name[i]) + ": " + str(price[i]) + "\n")
         else:
             for i in range((page * 10) - 10, (page * 10)):
                 print(str(i + 1) + ". " + str(name[i]) + ": " + str(price[i]) + "\n")
             more = input("Do you want to load more results? (y/n)")
-            if page >= 20:
-                if more == "Y":
-                    print("This is already the last page")
+            if page >= 20 and more == "Y":
+                print("This is already the last page")
             else:
                 if more == "y":
                     page += 1
-                    printLn(names, finalItems)
-                elif more == "n":
-                    pass
+                    printLn(name, price)
 
 Main()
