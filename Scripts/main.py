@@ -59,6 +59,12 @@ def Main():
 
     printLn(names, finalItems)
 
+    again = input("Do you want to do this again? (y/n)")
+    if again == "y":
+        Main()
+    elif again == "n":
+        quit()
+
 
 def printLn(name, price):
     global page, priceList
@@ -77,7 +83,7 @@ def printLn(name, price):
         else:
             for i in range((page * 10) - 10, (page * 10)):
                 print(str(i + 1) + ". " + str(name[i]) + ": " + str(price[i]) + "\n")
-            more = input("Do you want to load more results? (y/n)\n")
+            more = input("Do you want to load more results? (y/n)")
             if page >= 20:
                 if more == "Y":
                     print("This is already the last page")
@@ -88,11 +94,4 @@ def printLn(name, price):
                 elif more == "n":
                     pass
 
-
 Main()
-
-again = input("Do you want to do this again? (y/n)\n")
-if again == "y":
-    Main()
-elif again == "n":
-    quit()
