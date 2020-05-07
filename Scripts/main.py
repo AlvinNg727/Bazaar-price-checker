@@ -12,8 +12,8 @@ page = 1
 names = []
 finalItems = []
 
-checkItem = requests.get("https://api.hypixel.net/skyblock/bazaar?key=" + api_key).json()
-checkItem = checkItem["products"]
+#checkItem = requests.get("https://api.hypixel.net/skyblock/bazaar?key=" + api_key).json()
+#checkItem = checkItem["products"]
 
 lowestAmount = 0
 
@@ -33,6 +33,10 @@ def check():
 
 def Main():
     global currentIndex, priceList, names, finalItems, lowestAmount, page
+
+    checkItem = requests.get("https://api.hypixel.net/skyblock/bazaar?key=" + api_key).json()
+    checkItem = checkItem["products"]
+
     currentIndex = 0
     priceList.clear()
     names.clear()
