@@ -15,28 +15,30 @@ finalItems = []
 checkItem = requests.get("https://api.hypixel.net/skyblock/bazaar?key=" + api_key).json()
 checkItem = checkItem["products"]
 
+lowestAmount = 0
+
+def check():
+    global lowestAmount
+    try:
+        lowestAmount = int(input("What is the lowest amount of insta buys and insta sells: "))
+    except ValueError:
+        print("That is not a valid number.")
+        check()
+    if lowestAmount >= 0:
+        pass
+    else:
+        print("That is not a valid number.")
+        check()
+
+
 def Main():
-    global currentIndex, priceList, names, finalItems
+    global currentIndex, priceList, names, finalItems, lowestAmount
     currentIndex = 0
     priceList.clear()
     names.clear()
     finalItems.clear()
     item = ""
-    lowestAmount = 0
-    
-    def check():
-        lowestAmount = 0
-        try:
-            lowestAmount = int(input("What is the lowest amount of insta buys and insta sells: "))
-        except ValueError:
-            print("That is not a valid number.")
-            check()
-        if lowestAmount >= 0:
-            pass
-        else:
-            print("That is not a valid number.")
-            check()
-    
+
     check()
 
     startTime = time.time()
@@ -50,12 +52,13 @@ def Main():
         print(str(currentIndex) + "/197    " + str(round((endTime - startTime), 1)) + " seconds")
 
     priceList.sort(reverse=True)
-    
+
     for i in range(len(priceList)):
         names.append(priceList[i][1])
         finalItems.append(priceList[i][0])
 
     printLn(names, finalItems)
+
 
 def printLn(name, price):
     global page, priceList
@@ -66,7 +69,7 @@ def printLn(name, price):
         maxPage = (len(priceList) // 10) + 1
     elif len(priceList) % 10 == 0:
         maxPage = len(priceList) // 10
-    
+
     if page <= maxPage:
         if page == maxPage:
             for i in range((page * 10) - 10, len(priceList)):
@@ -84,6 +87,7 @@ def printLn(name, price):
                     printLn(names, finalItems)
                 elif more == "n":
                     pass
+
 
 Main()
 
