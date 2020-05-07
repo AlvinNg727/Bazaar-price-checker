@@ -22,8 +22,22 @@ def Main():
     names.clear()
     finalItems.clear()
     item = ""
-
-    lowestAmount = 20000
+    lowestAmount = 0
+    
+    def check():
+        lowestAmount = 0
+        try:
+            lowestAmount = int(input("What is the lowest amount of insta buys and insta sells: "))
+        except ValueError:
+            print("That is not a valid number.")
+            check()
+        if lowestAmount >= 0:
+            pass
+        else:
+            print("That is not a valid number.")
+            check()
+    
+    check()
 
     startTime = time.time()
 
