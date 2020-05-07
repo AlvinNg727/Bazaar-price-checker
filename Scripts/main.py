@@ -32,12 +32,13 @@ def check():
 
 
 def Main():
-    global currentIndex, priceList, names, finalItems, lowestAmount
+    global currentIndex, priceList, names, finalItems, lowestAmount, page
     currentIndex = 0
     priceList.clear()
     names.clear()
     finalItems.clear()
     item = ""
+    page = 1
 
     check()
 
