@@ -62,7 +62,7 @@ def Main():
             item = check_average(bazaarJson, value)
             itemsList.append([item, key])
         currentIndex += 1
-        print(str(currentIndex) + "/197    ")
+        print(str(round((currentIndex / 197 * 100), 1)) + "%")
 
     #reverse the list
     itemsList.sort(reverse=True)
