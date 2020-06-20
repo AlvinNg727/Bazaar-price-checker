@@ -6,17 +6,16 @@ import check_missing
 api_key = "ba710f2d-6547-4936-8aab-72b01300a8a5"
 
 def check_average(json, productId):
+    buyPrice = 0
+    sellPrice = 0
     #if there are no buy orders for the item, the buyPrice will = 0
     if len(json[productId]['sell_summary']) > 0:
         buyPrice = json[productId]["sell_summary"][0]["pricePerUnit"]
-    else:
-        buyPrice = 0
 
     #if there are no sell orders for the item, the sellPrice will = 0
     if len(json[productId]['buy_summary']) > 0:
         sellPrice = json[productId]["buy_summary"][0]["pricePerUnit"]
-    else:
-        sellPrice = 0
+
     return round((sellPrice - buyPrice), 1)
 
 #the lowest amount the insta sell and buy have to be in last 7d
@@ -30,33 +29,28 @@ def getAmount():
     except ValueError:
         print("That is not a valid number.")
         getAmount()
-    if lowestAmount >= 0:
-        pass
-    else:
+    if lowestAmount < 0:
         print("That is not a valid number.")
         getAmount()
-
-itemsList = []
-
-names = []
-finalItems = []
 
 def MainLoop():
     check_missing.check()
     getAmount()
-
+    
+    itemsList = []
+    itemNames = []
+    productId = []
     while True:
         try:
-            global itemsList, names, finalItems
+            #global itemsList, itemNames, productId
             itemsList.clear()
-            names.clear()
-            finalItems.clear()
-            item = ""
+            itemNames.clear()
+            productId.clear()
 
             bazaarJson = requests.get("https://api.hypixel.net/skyblock/bazaar?key=" + api_key).json()
             bazaarJson = bazaarJson["products"]
 
-            #get
+            #get the list of items that have a average sell more then the lowest amount
             for key in items:
                 value = items[key]
                 if (bazaarJson[value]["quick_status"]["sellMovingWeek"] >= lowestAmount) and (bazaarJson[value]["quick_status"]["buyMovingWeek"] >= lowestAmount):
@@ -67,10 +61,10 @@ def MainLoop():
             itemsList.sort(reverse=True)
 
             for i in range(len(itemsList)):
-                names.append(itemsList[i][1])
-                finalItems.append(itemsList[i][0])
+                itemNames.append(itemsList[i][1])
+                productId.append(itemsList[i][0])
 
-            printLn(names, finalItems)
+            printLn(itemNames, productId)
             time.sleep(5)
         except KeyboardInterrupt:
             print("Stopping...")
