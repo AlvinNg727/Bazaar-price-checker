@@ -1,7 +1,7 @@
 import requests
 import time
 from items import items
-
+import check_missing
 
 api_key = "ba710f2d-6547-4936-8aab-72b01300a8a5"
 
@@ -41,38 +41,43 @@ itemsList = []
 names = []
 finalItems = []
 
-def Main():
+def MainLoop():
+    check_missing.check()
     getAmount()
 
     while True:
-        global itemsList, names, finalItems
-        itemsList.clear()
-        names.clear()
-        finalItems.clear()
-        item = ""
+        try:
+            global itemsList, names, finalItems
+            itemsList.clear()
+            names.clear()
+            finalItems.clear()
+            item = ""
 
-        bazaarJson = requests.get("https://api.hypixel.net/skyblock/bazaar?key=" + api_key).json()
-        bazaarJson = bazaarJson["products"]
+            bazaarJson = requests.get("https://api.hypixel.net/skyblock/bazaar?key=" + api_key).json()
+            bazaarJson = bazaarJson["products"]
 
-        #get
-        for key in items:
-            value = items[key]
-            if (bazaarJson[value]["quick_status"]["sellMovingWeek"] >= lowestAmount) and (bazaarJson[value]["quick_status"]["buyMovingWeek"] >= lowestAmount):
-                item = check_average(bazaarJson, value)
-                itemsList.append([item, key])
+            #get
+            for key in items:
+                value = items[key]
+                if (bazaarJson[value]["quick_status"]["sellMovingWeek"] >= lowestAmount) and (bazaarJson[value]["quick_status"]["buyMovingWeek"] >= lowestAmount):
+                    item = check_average(bazaarJson, value)
+                    itemsList.append([item, key])
 
-        #reverse the list
-        itemsList.sort(reverse=True)
+            #reverse the list
+            itemsList.sort(reverse=True)
 
-        for i in range(len(itemsList)):
-            names.append(itemsList[i][1])
-            finalItems.append(itemsList[i][0])
+            for i in range(len(itemsList)):
+                names.append(itemsList[i][1])
+                finalItems.append(itemsList[i][0])
 
-        printLn(names, finalItems)
-        time.sleep(5)
+            printLn(names, finalItems)
+            time.sleep(5)
+        except KeyboardInterrupt:
+            print("Stopping...")
+            break
 
 def printLn(name, price):
     for i in range(0, 10):
         print(f"{str(i + 1)}. {str(name[i])}: {str(price[i])}\n")
 
-Main()
+MainLoop()
